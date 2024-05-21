@@ -1,0 +1,9 @@
+io.o
+main.o
+parse.o
+process.o
+shell.o
+shell
+in.txt
+out.txt
+tmp.txt

@@ -1,0 +1,11 @@
+httpserver
+httpserver.o
+libhttp.o
+wq.o
+files/large.html
+files/my_documents/garden_flowers_5-wallpaper-7680x4320.jpg
+files/my_documents/ce424-002-hw0.pdf
+files/my_documents/07 - Goodbye Blue Sky.mp3
+files/my_documents/music.mp3
+files/my_documents/music 1.mp3
+files/my_documents/12_01_Piano_Concerto_In_A_Minor.mp3

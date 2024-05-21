@@ -1,0 +1,433 @@
+1.
+gcc -m32 -S -o recurse.S recurse.c
+
+ln34:	subl	$1, %eax
+ln35:	subl	$12, %esp
+ln36:	pushl	%eax
+ln37:	call	recur
+
+%eax contains the value of i. So at line 34, we decrease it by 1. This way we are making i-1 which is the input of the function recur. In next two lines we are pushing the value of i to the stack. This is how parameters are passed to the function in this assembly. Line 37 is the call to the function recur.
+================================================================================
+
+
+
+2.
+.text contains the program code.
+.data contains the program data.
+
+gcc -m32 -c recurse.S -o recurse.obj
+objdump -D recurse.obj
+
+recurse.obj:     file format elf32-i386
+
+
+Disassembly of section .group:
+
+00000000 <.group>:
+   0:   01 00                   add    %eax,(%eax)
+   2:   00 00                   add    %al,(%eax)
+   4:   07                      pop    %es
+   5:   00 00                   add    %al,(%eax)
+        ...
+
+Disassembly of section .text:
+
+00000000 <recur>:
+   0:   55                      push   %ebp
+   1:   89 e5                   mov    %esp,%ebp
+   3:   53                      push   %ebx
+   4:   83 ec 14                sub    $0x14,%esp
+   7:   e8 fc ff ff ff          call   8 <recur+0x8>
+   c:   05 01 00 00 00          add    $0x1,%eax
+  11:   8b 55 08                mov    0x8(%ebp),%edx
+  14:   89 55 f4                mov    %edx,-0xc(%ebp)
+  17:   83 ec 08                sub    $0x8,%esp
+  1a:   ff 75 08                pushl  0x8(%ebp)
+  1d:   8d 90 00 00 00 00       lea    0x0(%eax),%edx
+  23:   52                      push   %edx
+  24:   89 c3                   mov    %eax,%ebx
+  26:   e8 fc ff ff ff          call   27 <recur+0x27>
+  2b:   83 c4 10                add    $0x10,%esp
+  2e:   83 7d 08 00             cmpl   $0x0,0x8(%ebp)
+  32:   7e 14                   jle    48 <recur+0x48>
+  34:   8b 45 08                mov    0x8(%ebp),%eax
+  37:   83 e8 01                sub    $0x1,%eax
+  3a:   83 ec 0c                sub    $0xc,%esp
+  3d:   50                      push   %eax
+  3e:   e8 fc ff ff ff          call   3f <recur+0x3f>
+  43:   83 c4 10                add    $0x10,%esp
+  46:   eb 05                   jmp    4d <recur+0x4d>
+  48:   b8 00 00 00 00          mov    $0x0,%eax
+  4d:   8b 5d fc                mov    -0x4(%ebp),%ebx
+  50:   c9                      leave  
+  51:   c3                      ret    
+
+Disassembly of section .rodata:
+
+00000000 <.rodata>:
+   0:   25                      .byte 0x25
+   1:   69                      .byte 0x69
+   2:   0a 00                   or     (%eax),%al
+
+Disassembly of section .text.__x86.get_pc_thunk.ax:
+
+00000000 <__x86.get_pc_thunk.ax>:
+   0:   8b 04 24                mov    (%esp),%eax
+   3:   c3                      ret    
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:   00 47 43                add    %al,0x43(%edi)
+   3:   43                      inc    %ebx
+   4:   3a 20                   cmp    (%eax),%ah
+   6:   28 55 62                sub    %dl,0x62(%ebp)
+   9:   75 6e                   jne    79 <recur+0x79>
+   b:   74 75                   je     82 <recur+0x82>
+   d:   20 37                   and    %dh,(%edi)
+   f:   2e 35 2e 30 2d 33       cs xor $0x332d302e,%eax
+  15:   75 62                   jne    79 <recur+0x79>
+  17:   75 6e                   jne    87 <recur+0x87>
+  19:   74 75                   je     90 <recur+0x90>
+  1b:   31 7e 31                xor    %edi,0x31(%esi)
+  1e:   38 2e                   cmp    %ch,(%esi)
+  20:   30 34 29                xor    %dh,(%ecx,%ebp,1)
+  23:   20 37                   and    %dh,(%edi)
+  25:   2e                      cs
+  26:   35                      .byte 0x35
+  27:   2e 30 00                xor    %al,%cs:(%eax)
+
+Disassembly of section .eh_frame:
+
+00000000 <.eh_frame>:
+   0:   14 00                   adc    $0x0,%al
+   2:   00 00                   add    %al,(%eax)
+   4:   00 00                   add    %al,(%eax)
+   6:   00 00                   add    %al,(%eax)
+   8:   01 7a 52                add    %edi,0x52(%edx)
+   b:   00 01                   add    %al,(%ecx)
+   d:   7c 08                   jl     17 <.eh_frame+0x17>
+   f:   01 1b                   add    %ebx,(%ebx)
+  11:   0c 04                   or     $0x4,%al
+  13:   04 88                   add    $0x88,%al
+  15:   01 00                   add    %eax,(%eax)
+  17:   00 20                   add    %ah,(%eax)
+  19:   00 00                   add    %al,(%eax)
+  1b:   00 1c 00                add    %bl,(%eax,%eax,1)
+  1e:   00 00                   add    %al,(%eax)
+  20:   00 00                   add    %al,(%eax)
+  22:   00 00                   add    %al,(%eax)
+  24:   52                      push   %edx
+  25:   00 00                   add    %al,(%eax)
+  27:   00 00                   add    %al,(%eax)
+  29:   41                      inc    %ecx
+  2a:   0e                      push   %cs
+  2b:   08 85 02 42 0d 05       or     %al,0x50d4202(%ebp)
+  31:   44                      inc    %esp
+  32:   83 03 02                addl   $0x2,(%ebx)
+  35:   4a                      dec    %edx
+  36:   c5 c3 0c                (bad)  
+  39:   04 04                   add    $0x4,%al
+  3b:   00 10                   add    %dl,(%eax)
+  3d:   00 00                   add    %al,(%eax)
+  3f:   00 40 00                add    %al,0x0(%eax)
+  42:   00 00                   add    %al,(%eax)
+  44:   00 00                   add    %al,(%eax)
+  46:   00 00                   add    %al,(%eax)
+  48:   04 00                   add    $0x0,%al
+  4a:   00 00                   add    %al,(%eax)
+  4c:   00 00                   add    %al,(%eax)
+        ...
+
+gcc -m32 -c map.S -o map.obj
+objdump -D map.obj
+
+map.obj:     file format elf32-i386
+
+
+Disassembly of section .group:
+
+00000000 <.group>:
+   0:   01 00                   add    %eax,(%eax)
+   2:   00 00                   add    %al,(%eax)
+   4:   06                      push   %es
+   5:   00 00                   add    %al,(%eax)
+        ...
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:   8d 4c 24 04             lea    0x4(%esp),%ecx
+   4:   83 e4 f0                and    $0xfffffff0,%esp
+   7:   ff 71 fc                pushl  -0x4(%ecx)
+   a:   55                      push   %ebp
+   b:   89 e5                   mov    %esp,%ebp
+   d:   53                      push   %ebx
+   e:   51                      push   %ecx
+   f:   83 ec 10                sub    $0x10,%esp
+  12:   e8 fc ff ff ff          call   13 <main+0x13>
+  17:   81 c3 02 00 00 00       add    $0x2,%ebx
+  1d:   c7 45 ec 00 00 00 00    movl   $0x0,-0x14(%ebp)
+  24:   83 ec 0c                sub    $0xc,%esp
+  27:   6a 64                   push   $0x64
+  29:   e8 fc ff ff ff          call   2a <main+0x2a>
+  2e:   83 c4 10                add    $0x10,%esp
+  31:   89 45 f0                mov    %eax,-0x10(%ebp)
+  34:   83 ec 0c                sub    $0xc,%esp
+  37:   6a 64                   push   $0x64
+  39:   e8 fc ff ff ff          call   3a <main+0x3a>
+  3e:   83 c4 10                add    $0x10,%esp
+  41:   89 45 f4                mov    %eax,-0xc(%ebp)
+  44:   83 ec 0c                sub    $0xc,%esp
+  47:   6a 03                   push   $0x3
+  49:   e8 fc ff ff ff          call   4a <main+0x4a>
+  4e:   83 c4 10                add    $0x10,%esp
+  51:   b8 00 00 00 00          mov    $0x0,%eax
+  56:   8d 65 f8                lea    -0x8(%ebp),%esp
+  59:   59                      pop    %ecx
+  5a:   5b                      pop    %ebx
+  5b:   5d                      pop    %ebp
+  5c:   8d 61 fc                lea    -0x4(%ecx),%esp
+  5f:   c3                      ret    
+
+Disassembly of section .data:
+
+00000000 <stuff>:
+   0:   07                      pop    %es
+   1:   00 00                   add    %al,(%eax)
+        ...
+
+Disassembly of section .text.__x86.get_pc_thunk.bx:
+
+00000000 <__x86.get_pc_thunk.bx>:
+   0:   8b 1c 24                mov    (%esp),%ebx
+   3:   c3                      ret    
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:   00 47 43                add    %al,0x43(%edi)
+   3:   43                      inc    %ebx
+   4:   3a 20                   cmp    (%eax),%ah
+   6:   28 55 62                sub    %dl,0x62(%ebp)
+   9:   75 6e                   jne    79 <main+0x79>
+   b:   74 75                   je     82 <main+0x82>
+   d:   20 37                   and    %dh,(%edi)
+   f:   2e 35 2e 30 2d 33       cs xor $0x332d302e,%eax
+  15:   75 62                   jne    79 <main+0x79>
+  17:   75 6e                   jne    87 <main+0x87>
+  19:   74 75                   je     90 <main+0x90>
+  1b:   31 7e 31                xor    %edi,0x31(%esi)
+  1e:   38 2e                   cmp    %ch,(%esi)
+  20:   30 34 29                xor    %dh,(%ecx,%ebp,1)
+  23:   20 37                   and    %dh,(%edi)
+  25:   2e                      cs
+  26:   35                      .byte 0x35
+  27:   2e 30 00                xor    %al,%cs:(%eax)
+
+Disassembly of section .eh_frame:
+
+00000000 <.eh_frame>:
+   0:   14 00                   adc    $0x0,%al
+   2:   00 00                   add    %al,(%eax)
+   4:   00 00                   add    %al,(%eax)
+   6:   00 00                   add    %al,(%eax)
+   8:   01 7a 52                add    %edi,0x52(%edx)
+   b:   00 01                   add    %al,(%ecx)
+   d:   7c 08                   jl     17 <.eh_frame+0x17>
+   f:   01 1b                   add    %ebx,(%ebx)
+  11:   0c 04                   or     $0x4,%al
+  13:   04 88                   add    $0x88,%al
+  15:   01 00                   add    %eax,(%eax)
+  17:   00 30                   add    %dh,(%eax)
+  19:   00 00                   add    %al,(%eax)
+  1b:   00 1c 00                add    %bl,(%eax,%eax,1)
+  1e:   00 00                   add    %al,(%eax)
+  20:   00 00                   add    %al,(%eax)
+  22:   00 00                   add    %al,(%eax)
+  24:   60                      pusha  
+  25:   00 00                   add    %al,(%eax)
+  27:   00 00                   add    %al,(%eax)
+  29:   44                      inc    %esp
+  2a:   0c 01                   or     $0x1,%al
+  2c:   00 47 10                add    %al,0x10(%edi)
+  2f:   05 02 75 00 44          add    $0x44007502,%eax
+  34:   0f 03 75 78             lsl    0x78(%ebp),%esi
+  38:   06                      push   %es
+  39:   10 03                   adc    %al,(%ebx)
+  3b:   02 75 7c                add    0x7c(%ebp),%dh
+  3e:   02 4b c1                add    -0x3f(%ebx),%cl
+  41:   0c 01                   or     $0x1,%al
+  43:   00 41 c3                add    %al,-0x3d(%ecx)
+  46:   41                      inc    %ecx
+  47:   c5 43 0c                lds    0xc(%ebx),%eax
+  4a:   04 04                   add    $0x4,%al
+  4c:   10 00                   adc    %al,(%eax)
+  4e:   00 00                   add    %al,(%eax)
+  50:   50                      push   %eax
+  51:   00 00                   add    %al,(%eax)
+  53:   00 00                   add    %al,(%eax)
+  55:   00 00                   add    %al,(%eax)
+  57:   00 04 00                add    %al,(%eax,%eax,1)
+  5a:   00 00                   add    %al,(%eax)
+  5c:   00 00                   add    %al,(%eax)
+        ...
+================================================================================
+
+
+
+3.
+objdump -t recurse.obj
+
+recurse.obj:     file format elf32-i386
+
+SYMBOL TABLE:
+00000000 l    df *ABS*  00000000 recurse.c
+00000000 l    d  .text  00000000 .text
+00000000 l    d  .data  00000000 .data
+00000000 l    d  .bss   00000000 .bss
+00000000 l    d  .rodata        00000000 .rodata
+00000000 l    d  .text.__x86.get_pc_thunk.ax    00000000 .text.__x86.get_pc_thunk.ax
+00000000 l    d  .note.GNU-stack        00000000 .note.GNU-stack
+00000000 l    d  .eh_frame      00000000 .eh_frame
+00000000 l    d  .comment       00000000 .comment
+00000000 l    d  .group 00000000 .group
+00000000 g     F .text  00000052 recur
+00000000 g     F .text.__x86.get_pc_thunk.ax    00000000 .hidden __x86.get_pc_thunk.ax
+00000000         *UND*  00000000 _GLOBAL_OFFSET_TABLE_
+00000000         *UND*  00000000 printf
+================================================================================
+
+
+4.
+g: Global symbol.
+O: Object symbol.
+*UND*: Undefined symbol.
+================================================================================
+
+
+5.
+With relocation option, we can find other address of the 'malloc' function.
+
+objdump --reloc map.obj
+
+map.obj:     file format elf32-i386
+
+RELOCATION RECORDS FOR [.text]:
+OFFSET   TYPE              VALUE 
+00000013 R_386_PC32        __x86.get_pc_thunk.bx
+00000019 R_386_GOTPC       _GLOBAL_OFFSET_TABLE_
+0000002a R_386_PLT32       malloc
+0000003a R_386_PLT32       malloc
+0000004a R_386_PLT32       recur
+================================================================================
+
+
+
+6.
+We can find recur symbol in map.obj and recurse.obj files. We already seen recurse.obj symbol table in section 3. Here is the symbol table of map.obj file:
+
+objdump -t map.obj
+
+map.obj:     file format elf32-i386
+
+SYMBOL TABLE:
+00000000 l    df *ABS*  00000000 map.c
+00000000 l    d  .text  00000000 .text
+00000000 l    d  .data  00000000 .data
+00000000 l    d  .bss   00000000 .bss
+00000000 l    d  .text.__x86.get_pc_thunk.bx    00000000 .text.__x86.get_pc_thunk.bx
+00000000 l    d  .note.GNU-stack        00000000 .note.GNU-stack
+00000000 l    d  .eh_frame      00000000 .eh_frame
+00000000 l    d  .comment       00000000 .comment
+00000000 l    d  .group 00000000 .group
+00000004       O *COM*  00000004 foo
+00000000 g     O .data  00000004 stuff
+00000000 g     F .text  00000060 main
+00000000 g     F .text.__x86.get_pc_thunk.bx    00000000 .hidden __x86.get_pc_thunk.bx
+00000000         *UND*  00000000 _GLOBAL_OFFSET_TABLE_
+00000000         *UND*  00000000 malloc
+00000000         *UND*  00000000 recur
+================================================================================
+
+
+
+7.
+As we excpected, two symbol tables merged into this one. We can see some symbols which where priviously undefined, now are defined in resulting symbol table. For example, recur symbol is undefined in map.obj file, but since we have it in recurse.obj file, it is present in this symbol table.
+
+gcc -m32 map.obj recurse.obj -o map
+
+map:     file format elf32-i386
+
+SYMBOL TABLE:
+00000154 l    d  .interp        00000000              .interp
+00000168 l    d  .note.ABI-tag  00000000              .note.ABI-tag
+00000188 l    d  .note.gnu.build-id     00000000              .note.gnu.build-id
+000001ac l    d  .gnu.hash      00000000              .gnu.hash
+000001cc l    d  .dynsym        00000000              .dynsym
+0000025c l    d  .dynstr        00000000              .dynstr
+00000300 l    d  .gnu.version   00000000              .gnu.version
+00000314 l    d  .gnu.version_r 00000000              .gnu.version_r
+00000344 l    d  .rel.dyn       00000000              .rel.dyn
+00000384 l    d  .rel.plt       00000000              .rel.plt
+0000039c l    d  .init  00000000              .init
+000003c0 l    d  .plt   00000000              .plt
+00000400 l    d  .plt.got       00000000              .plt.got
+00000410 l    d  .text  00000000              .text
+00000674 l    d  .fini  00000000              .fini
+00000688 l    d  .rodata        00000000              .rodata
+00000694 l    d  .eh_frame_hdr  00000000              .eh_frame_hdr
+000006d8 l    d  .eh_frame      00000000              .eh_frame
+00001ed4 l    d  .init_array    00000000              .init_array
+00001ed8 l    d  .fini_array    00000000              .fini_array
+00001edc l    d  .dynamic       00000000              .dynamic
+00001fd4 l    d  .got   00000000              .got
+00002000 l    d  .data  00000000              .data
+0000200c l    d  .bss   00000000              .bss
+00000000 l    d  .comment       00000000              .comment
+00000000 l    df *ABS*  00000000              crtstuff.c
+00000460 l     F .text  00000000              deregister_tm_clones
+000004a0 l     F .text  00000000              register_tm_clones
+000004f0 l     F .text  00000000              __do_global_dtors_aux
+0000200c l     O .bss   00000001              completed.7283
+00001ed8 l     O .fini_array    00000000              __do_global_dtors_aux_fini_array_entry
+00000540 l     F .text  00000000              frame_dummy
+00001ed4 l     O .init_array    00000000              __frame_dummy_init_array_entry
+00000000 l    df *ABS*  00000000              map.c
+00000000 l    df *ABS*  00000000              recurse.c
+00000000 l    df *ABS*  00000000              crtstuff.c
+000007f4 l     O .eh_frame      00000000              __FRAME_END__
+00000000 l    df *ABS*  00000000              
+00001ed8 l       .init_array    00000000              __init_array_end
+00001edc l     O .dynamic       00000000              _DYNAMIC
+00001ed4 l       .init_array    00000000              __init_array_start
+00000694 l       .eh_frame_hdr  00000000              __GNU_EH_FRAME_HDR
+00001fd4 l     O .got   00000000              _GLOBAL_OFFSET_TABLE_
+00000670 g     F .text  00000002              __libc_csu_fini
+00000000  w      *UND*  00000000              _ITM_deregisterTMCloneTable
+00000450 g     F .text  00000004              .hidden __x86.get_pc_thunk.bx
+00002000  w      .data  00000000              data_start
+00000000       F *UND*  00000000              printf@@GLIBC_2.0
+0000200c g       .data  00000000              _edata
+00000674 g     F .fini  00000000              _fini
+000005ad g     F .text  00000052              recur
+00000549 g     F .text  00000000              .hidden __x86.get_pc_thunk.dx
+00000000  w    F *UND*  00000000              __cxa_finalize@@GLIBC_2.1.3
+00002008 g     O .data  00000004              stuff
+00000000       F *UND*  00000000              malloc@@GLIBC_2.0
+00002000 g       .data  00000000              __data_start
+00000000  w      *UND*  00000000              __gmon_start__
+00002004 g     O .data  00000000              .hidden __dso_handle
+0000068c g     O .rodata        00000004              _IO_stdin_used
+00000000       F *UND*  00000000              __libc_start_main@@GLIBC_2.0
+00000610 g     F .text  0000005d              __libc_csu_init
+00002010 g     O .bss   00000004              foo
+00002014 g       .bss   00000000              _end
+00000410 g     F .text  00000000              _start
+00000688 g     O .rodata        00000004              _fp_hw
+0000200c g       .bss   00000000              __bss_start
+0000054d g     F .text  00000060              main
+000005ff g     F .text  00000000              .hidden __x86.get_pc_thunk.ax
+0000200c g     O .data  00000000              .hidden __TMC_END__
+00000000  w      *UND*  00000000              _ITM_registerTMCloneTable
+0000039c g     F .init  00000000              _init

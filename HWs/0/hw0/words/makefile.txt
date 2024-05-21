@@ -1,0 +1,43 @@
+Makefile Line by Line Explanation:
+
+Line: .DEFAULT_GOAL := default
+Explanation: ".DEFAULT_GOAL" is an special variable that is used to set the default goal. Defualt goal will be used if no target is specified when invoking make. Here our default goal is "default" which defined in line 19 of the Makefile.
+
+Line: CC?=gcc
+Explanation: This variable is our c language compiler. Here we are using "gcc" compiler. For example, we can use clang by changing this line to "CC?=clang".
+
+Line: CFLAGS?=-Wall
+Explanation: This variable is used to set the flags for the c compiler. Here we are using "-Wall" flag. Which will display all the warnings. We can add more flags too. For example I used "-g" flag to debug the code.
+
+Line: SOURCES=main.c word_count.c
+Explanation: This variable contains the source files names. These source files will be compiled to object files later. We have two source files in our project. One is "main.c" and the other is "word_count.c".
+
+Line: # comment the following out if you are providing your own sort_words
+Explanation: Comment!
+
+Line: LIBRARIES=wc_sort.o
+Explanation: This variable contains the object files names of the libraries we are using in our project. Here the only library we are using is "wc_sort.o". This object file is provided to us. This library provides "wordcount_sort" function impelementation. We already have this function prototype in "word_count.h" file and we use it to sort the words.
+
+Line: BINARIES=words
+Explanation: This variable contains the binary files names we want to create. Here we are creating only one binary file named "words".
+
+Line: %: %.c
+Explanation: This is a pattern rule which uses the percent sign wild card. "%" simply matches with any non-empty string. In this case, our dependency are any file ending with ".c" and our target is the same as the source file without the ".c" extension. Note that this this apply to each source file.
+
+Line: 	$(CC) $(CFLAGS) $(LIBRARIES) -o $@ $^
+Explanation: This is the action for previosly mentioned target. It is used to compile a single source files and link it with libraries. As mentioned in variable declaration, our compiler is "gcc", our flag is "-Wall", and our library is "wc_sort.o". The important part is "$@" and "$^". "$@" will be replaced by the target name and "$^" will be replaced by the prerequiste name. 
+
+Line: clean:
+Explanation: Introducing the "clean" target. This target is used with the "make clean" command. This command should delete all the files created by the make process.
+
+Line: 	rm -f $(BINARIES)
+Explanation: Action for the "clean" target. Here we are deleting the binary files. As mentioned before, we have only one binary file named "words".
+
+Line: executable:
+Explanation: This line introduce the "executable" target.
+
+Line: 	$(CC) $(CFLAGS) $(SOURCES) $(LIBRARIES) -o $(BINARIES)
+Explanation: The action for the "executable" target. Here we are compiling our source files with the specified compiler, flags, and linking them with our libraries to produce binaries.
+
+Line: default: executable
+Explanation: As mentioned before, we set the special variable ".DEFAULT_GOAL" to "defualt" target. Here we are defining the "defualt" target. We can see this target depends on "executable" target. So if we run "make" without any target, "default" target which indeed depends only on "executable" target will be executed.
